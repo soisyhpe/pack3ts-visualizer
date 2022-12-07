@@ -1,5 +1,7 @@
 package fr.eroschn.cours.lu3in033.projetfx.ipv4;//package fr.eroschn.cours.lu3in033.projetfx.ipv4;
 
+import java.util.Arrays;
+
 public class IpAddress {
 
     private final byte[] bytes;
@@ -27,4 +29,12 @@ public class IpAddress {
         return ipAddress;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof IpAddress)) return false;
+        IpAddress a = (IpAddress) obj;
+        return Arrays.equals(a.getBytes(), this.getBytes());
+    }
 }

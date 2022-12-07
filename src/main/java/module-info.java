@@ -10,4 +10,6 @@ module fr.eroschn.cours.lu3in033.projetfx {
     opens fr.eroschn.cours.lu3in033.projetfx.ethernet to javafx.fxml;
     exports fr.eroschn.cours.lu3in033.projetfx.application;
     opens fr.eroschn.cours.lu3in033.projetfx.application to javafx.fxml;
+    exports fr.eroschn.cours.lu3in033.projetfx.application.windows;
+    opens fr.eroschn.cours.lu3in033.projetfx.application.windows to javafx.fxml;
 }
