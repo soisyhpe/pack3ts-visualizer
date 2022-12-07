@@ -8,9 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -24,14 +22,19 @@ public class HomeWindow {
 
     public HomeWindow(Stage stage) {
 
-        Pane root = new Pane();
-        FileChooser fileChooser = new FileChooser();
-
         // on récupère les infos de l'os
         final String os = System.getProperty("os.name");
         if (os != null && os.startsWith("Mac")) isMacSupported = true;
 
+
+
+        FileChooser fileChooser = new FileChooser();
+
+
+
         Menu fileMenu = new Menu("Fichier");
+
+
 
         MenuItem openItem = new MenuItem("Ouvrir");
 
@@ -47,6 +50,7 @@ public class HomeWindow {
                 new DecoderWindow(new Stage(), file);
             }
         });
+
 
 
         Menu recentsMenu = new Menu("Ouvrir l'élément récent");
@@ -66,7 +70,9 @@ public class HomeWindow {
         recentsMenu.getItems().add(clearHistoric);
 
 
+
         SeparatorMenuItem s1 = new SeparatorMenuItem();
+
 
 
         Menu importMenu = new Menu("Importer...");
@@ -74,11 +80,14 @@ public class HomeWindow {
         importMenu.getItems().add(clipboardItem);
 
 
+
         MenuItem exportItem = new MenuItem("Exporter");
         exportItem.setDisable(true);
 
 
+
         SeparatorMenuItem s2 = new SeparatorMenuItem();
+
 
 
         MenuItem closeItem = new MenuItem("Fermer");
@@ -98,13 +107,12 @@ public class HomeWindow {
         MenuBar menuBar = new MenuBar();
         menuBar.useSystemMenuBarProperty().set(isMacSupported);
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setTop(menuBar);
 
 
         VBox box = new VBox();
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 200, 0, 200));
+
 
 
         VBox welcomeBox = new VBox();
@@ -124,6 +132,7 @@ public class HomeWindow {
         welcomeBox.getChildren().addAll(welcomeTitle, welcomeText);
 
 
+
         VBox startingBox = new VBox();
         startingBox.setAlignment(Pos.CENTER);
         startingBox.setPadding(new Insets(10, 0, 25, 0));
@@ -134,11 +143,6 @@ public class HomeWindow {
         explanationTitle.setFont(new Font(explanationTitle.getFont().getName(), 20));
 
         Separator explanationSeparator = new Separator();
-
-        /*Label explanationText = new Label();
-        explanationText.setText("Pour démarrer le visualisateur de trafic, il faut d'abord ouvrir une trame à partir d'un fichier : ⌘O");
-        explanationText.setCursor(Cursor.DEFAULT);
-        explanationText.setFont(new Font(explanationText.getFont().getName(), 15));*/
 
         VBox explanationBox = new VBox();
         explanationBox.setAlignment(Pos.CENTER);
@@ -153,7 +157,7 @@ public class HomeWindow {
         openFromFileLabel.setText("Pour ouvrir un fichier");
 
         Button openFromFileButton = new Button();
-        openFromFileButton.setText("⌘O");
+        openFromFileButton.setText(isMacSupported ? "⌘" : "CTRL" + "O");
         openFromFileButton.setCursor(Cursor.HAND);
         openFromFileButton.setFocusTraversable(false);
 
@@ -175,7 +179,7 @@ public class HomeWindow {
         openFromClipboardLabel.setText("Pour ouvrir depuis le presse-papier");
 
         Button openFromClipboardButton = new Button();
-        openFromClipboardButton.setText("⌘L");
+        openFromClipboardButton.setText(isMacSupported ? "⌘" : "CTRL" + "L");
         openFromClipboardButton.setCursor(Cursor.HAND);
         openFromClipboardButton.setFocusTraversable(false);
 
@@ -184,6 +188,7 @@ public class HomeWindow {
         explanationBox.getChildren().addAll(openFromFileBox, openFromClipboardBox);
 
         startingBox.getChildren().addAll(explanationTitle, explanationSeparator, explanationBox);
+
 
 
         VBox aboutBox = new VBox();
@@ -220,10 +225,8 @@ public class HomeWindow {
         aboutBox.getChildren().addAll(aboutTitle, aboutSeparator, aboutLinksBox);
 
 
-        root.getChildren().addAll(menuBar, welcomeBox, startingBox, aboutBox);
 
-
-        box.getChildren().addAll(welcomeBox, startingBox, aboutBox);
+        box.getChildren().addAll(menuBar, welcomeBox, startingBox, aboutBox);
 
         stage.setTitle("Decoder");
         stage.setMinWidth(1080);
