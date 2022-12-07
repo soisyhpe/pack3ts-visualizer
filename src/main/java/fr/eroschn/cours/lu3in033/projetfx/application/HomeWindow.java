@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -23,6 +24,7 @@ public class HomeWindow {
 
     public HomeWindow(Stage stage) {
 
+        Pane root = new Pane();
         FileChooser fileChooser = new FileChooser();
 
         // on récupère les infos de l'os
@@ -99,7 +101,7 @@ public class HomeWindow {
 
         fileMenu.getItems().addAll(openItem, recentsMenu, s1, importMenu, exportItem, s2, closeItem);
 
-        MenuBar menuBar = new MenuBar(fileMenu);
+        MenuBar menuBar = new MenuBar();
         menuBar.useSystemMenuBarProperty().set(isMacSupported);
 
         BorderPane borderPane = new BorderPane();
@@ -107,7 +109,7 @@ public class HomeWindow {
 
 
 
-        VBox box = new VBox(menuBar);
+        VBox box = new VBox();
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 200, 0, 200));
 
@@ -225,6 +227,9 @@ public class HomeWindow {
         aboutLinksBox.getChildren().addAll(manual, presentation, sourceCode);
 
         aboutBox.getChildren().addAll(aboutTitle, aboutSeparator, aboutLinksBox);
+
+
+        root.getChildren().addAll(menuBar, welcomeBox, startingBox, aboutBox);
 
 
 
