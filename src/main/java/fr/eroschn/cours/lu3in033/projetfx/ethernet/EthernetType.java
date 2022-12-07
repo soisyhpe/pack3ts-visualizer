@@ -24,6 +24,7 @@ public enum EthernetType {
 
     /**
      * Permet de convertir un short (2 octets) en un type ethernet
+     *
      * @param value valeur en short (2 octets)
      * @return le type ethernet correspondant
      */

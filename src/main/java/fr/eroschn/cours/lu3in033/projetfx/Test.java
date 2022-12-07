@@ -2,7 +2,9 @@ package fr.eroschn.cours.lu3in033.projetfx;
 
 import fr.eroschn.cours.lu3in033.projetfx.application.DecoderWindow;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+
 public class Test {
 
     public static void main(String[] args) {

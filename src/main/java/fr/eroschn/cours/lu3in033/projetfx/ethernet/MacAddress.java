@@ -6,7 +6,8 @@ public class MacAddress {
 
     public MacAddress(byte[] macAddress) {
         // erreur : si les octets en entrée n'ont pas la bonne taille
-        if (macAddress.length != 6) throw new IllegalArgumentException("Impossible de convertir les octets suivants en adresse MAC : " + macAddress);
+        if (macAddress.length != 6)
+            throw new IllegalArgumentException("Impossible de convertir les octets suivants en adresse MAC : " + macAddress);
 
         this.macAddress = macAddress;
     }
@@ -19,7 +20,7 @@ public class MacAddress {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         int i;
-        for (i = 0; i < macAddress.length-1; i++) {
+        for (i = 0; i < macAddress.length - 1; i++) {
             sb.append(Integer.toHexString(Byte.toUnsignedInt(macAddress[i])));
             sb.append(":");
         }

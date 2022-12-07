@@ -28,10 +28,10 @@ public class IPv4Header {
     public IPv4Header(byte[] bytes) {
 
         // version
-        version = ((int)bytes[0])/16;
+        version = ((int) bytes[0]) / 16;
 
         // internet header length
-        internetHeaderLength = ((int)bytes[0])%16;
+        internetHeaderLength = ((int) bytes[0]) % 16;
 
         // type of service
         typeOfService = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 1, 2));
@@ -44,9 +44,11 @@ public class IPv4Header {
 
         // flags
         int flags = Byte.toUnsignedInt(bytes[6]);
-        reserved = flags%64 == 1 ? true : false; flags = flags/64;
-        dontFragment = flags%2 == 1 ? true : false; flags = flags/2;
-        moreFragment = flags%2 == 1 ? true : false;
+        reserved = flags % 64 == 1;
+        flags = flags / 64;
+        dontFragment = flags % 2 == 1;
+        flags = flags / 2;
+        moreFragment = flags % 2 == 1;
 
         //fragment offset
         fragmentOffset = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 6, 8)) & 0x1FFF;
@@ -72,7 +74,6 @@ public class IPv4Header {
         // on a des options
         if (internetHeaderLength > 5) {
             options_ = "oui";
-            return;
         }
     }
 

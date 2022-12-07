@@ -26,13 +26,12 @@ public class IPv4Frame {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("En-tetes [ ");
-        sb.append(header);
-        sb.append(" ]\n");
-        sb.append("Donnees [ ");
-        sb.append(data);
-        sb.append(" ]");
-        return sb.toString();
+        String sb = "En-tetes [ " +
+                header +
+                " ]\n" +
+                "Donnees [ " +
+                data +
+                " ]";
+        return sb;
     }
 }

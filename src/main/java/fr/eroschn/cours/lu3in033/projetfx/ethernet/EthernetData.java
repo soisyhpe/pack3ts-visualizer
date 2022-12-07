@@ -8,7 +8,7 @@ public class EthernetData {
 
     public EthernetData(byte[] bytes) {
         int dataLength = Math.min((bytes.length - ETHERNET_HEADER_LENGTH), ETHERNET_DATA_MAX_LENGTH);
-    
+
         this.bytes = new byte[dataLength];
 
         int i, j = 0;

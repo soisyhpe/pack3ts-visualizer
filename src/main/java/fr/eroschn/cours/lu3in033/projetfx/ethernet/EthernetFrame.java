@@ -9,7 +9,8 @@ public class EthernetFrame {
 
     public EthernetFrame(byte[] bytes) {
         // erreur : la taille de la trame est inférieure à celle de l'en-tête
-        if (bytes.length < ETHERNET_HEADER_LENGTH) throw new IllegalArgumentException("L'en-tete ethernet n'est pas complete !");
+        if (bytes.length < ETHERNET_HEADER_LENGTH)
+            throw new IllegalArgumentException("L'en-tete ethernet n'est pas complete !");
 
         // on récupère l'en-tête
         header = new EthernetHeader(bytes);
@@ -20,6 +21,7 @@ public class EthernetFrame {
 
     /**
      * Récupérer l'en-tête de la trame ethernet
+     *
      * @return en-tête de la trame ethernet
      */
     public EthernetHeader getHeader() {
@@ -28,6 +30,7 @@ public class EthernetFrame {
 
     /**
      * Récupérer les données de la trame ethernet
+     *
      * @return les donnéesEthernetHeader.java de la trame
      */
     public EthernetData getData() {
@@ -36,13 +39,12 @@ public class EthernetFrame {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("En-tetes [ ");
-        sb.append(header);
-        sb.append(" ]\n");
-        sb.append("Donnees [ ");
-        sb.append(data);
-        sb.append(" ]");
-        return sb.toString();
+        String sb = "En-tetes [ " +
+                header +
+                " ]\n" +
+                "Donnees [ " +
+                data +
+                " ]";
+        return sb;
     }
 }

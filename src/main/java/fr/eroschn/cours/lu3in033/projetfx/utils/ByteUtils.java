@@ -6,11 +6,11 @@ public class ByteUtils {
     public static int byteArrayToInt(byte[] bytes) {
         int poids = 1;
         int res = 0;
-        
+
         int i;
-        for(i=bytes.length-1; i>= 0; i--) {
+        for (i = bytes.length - 1; i >= 0; i--) {
             res += (Byte.toUnsignedInt(bytes[i])) * poids;
-            poids = poids*256;
+            poids = poids * 256;
         }
         return res;
     }

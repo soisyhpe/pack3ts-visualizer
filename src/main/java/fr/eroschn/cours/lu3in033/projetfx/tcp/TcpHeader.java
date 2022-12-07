@@ -2,9 +2,7 @@ package fr.eroschn.cours.lu3in033.projetfx.tcp;//package fr.eroschn.cours.lu3in0
 
 import fr.eroschn.cours.lu3in033.projetfx.utils.ByteUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class TcpHeader {
 
@@ -44,22 +42,28 @@ public class TcpHeader {
         acknowledgementNumber = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
 
         // data offset
-        dataOffset = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 12, 13))/16;
+        dataOffset = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 12, 13)) / 16;
 
         // reserved
-        reserved = (ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 12, 13))%16) + (ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 13, 14)) & 0xC0);
+        reserved = (ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 12, 13)) % 16) + (ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 13, 14)) & 0xC0);
 
         //flags
         int flags = Byte.toUnsignedInt(bytes[13]);
         //ns = false;
         //cwr = false;
         //ece = false;
-        fin = flags%2 == 1 ? 1 : 0; flags = flags/2;
-        syn = flags%2 == 1 ? 1 : 0; flags = flags/2;
-        rst = flags%2 == 1 ? 1 : 0; flags = flags/2;
-        psh = flags%2 == 1 ? 1 : 0; flags = flags/2;
-        ack = flags%2 == 1 ? 1 : 0; flags = flags/2;
-        urg = flags%2 == 1 ? 1 : 0; flags = flags/2;
+        fin = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
+        syn = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
+        rst = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
+        psh = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
+        ack = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
+        urg = flags % 2 == 1 ? 1 : 0;
+        flags = flags / 2;
 
         //window
         window = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 14, 16));

@@ -49,7 +49,6 @@ public class HomeWindow {
         });
 
 
-
         Menu recentsMenu = new Menu("Ouvrir l'élément récent");
 
         MenuItem item = new MenuItem("(vide)");
@@ -61,14 +60,13 @@ public class HomeWindow {
         MenuItem clearHistoric = new MenuItem("Effacer l'historique");
         // clearHistoric.setDisable(true);
 
-        clearHistoric.setOnAction((e) -> {});
+        clearHistoric.setOnAction((e) -> {
+        });
 
         recentsMenu.getItems().add(clearHistoric);
 
 
-
         SeparatorMenuItem s1 = new SeparatorMenuItem();
-
 
 
         Menu importMenu = new Menu("Importer...");
@@ -76,14 +74,11 @@ public class HomeWindow {
         importMenu.getItems().add(clipboardItem);
 
 
-
         MenuItem exportItem = new MenuItem("Exporter");
         exportItem.setDisable(true);
 
 
-
         SeparatorMenuItem s2 = new SeparatorMenuItem();
-
 
 
         MenuItem closeItem = new MenuItem("Fermer");
@@ -98,7 +93,6 @@ public class HomeWindow {
         });
 
 
-
         fileMenu.getItems().addAll(openItem, recentsMenu, s1, importMenu, exportItem, s2, closeItem);
 
         MenuBar menuBar = new MenuBar();
@@ -106,7 +100,6 @@ public class HomeWindow {
 
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-
 
 
         VBox box = new VBox();
@@ -129,7 +122,6 @@ public class HomeWindow {
         welcomeText.setFont(new Font(welcomeText.getFont().getName(), 15));
 
         welcomeBox.getChildren().addAll(welcomeTitle, welcomeText);
-
 
 
         VBox startingBox = new VBox();
@@ -194,7 +186,6 @@ public class HomeWindow {
         startingBox.getChildren().addAll(explanationTitle, explanationSeparator, explanationBox);
 
 
-
         VBox aboutBox = new VBox();
         aboutBox.setAlignment(Pos.CENTER);
         aboutBox.setPadding(new Insets(10, 0, 25, 0));
@@ -230,7 +221,6 @@ public class HomeWindow {
 
 
         root.getChildren().addAll(menuBar, welcomeBox, startingBox, aboutBox);
-
 
 
         box.getChildren().addAll(welcomeBox, startingBox, aboutBox);

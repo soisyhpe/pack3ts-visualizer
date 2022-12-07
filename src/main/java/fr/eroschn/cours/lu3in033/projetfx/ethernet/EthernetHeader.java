@@ -23,6 +23,7 @@ public class EthernetHeader {
 
     /**
      * Récupérer l'adresse mac de destination
+     *
      * @return adresse mac de destination
      */
     public MacAddress getDestination() {
@@ -31,6 +32,7 @@ public class EthernetHeader {
 
     /**
      * Récupérer l'adresse mac source
+     *
      * @return adresse mac source de destination
      */
     public MacAddress getSource() {
@@ -39,6 +41,7 @@ public class EthernetHeader {
 
     /**
      * Récupérer le type ethernet
+     *
      * @return l'ethertype correspondant
      */
     public EthernetType getType() {

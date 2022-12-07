@@ -1,25 +1,22 @@
 package fr.eroschn.cours.lu3in033.projetfx.application;
 
-import fr.eroschn.cours.lu3in033.projetfx.Test;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetFrame;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetType;
 import fr.eroschn.cours.lu3in033.projetfx.http.HttpData;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IPv4Frame;
+import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpProtocol;
-import fr.eroschn.cours.lu3in033.projetfx.tcp.TcpHeader;
 import fr.eroschn.cours.lu3in033.projetfx.tcp.TcpSegment;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.stage.FileChooser;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -30,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class DecoderWindow {
 
-    private boolean isMacSupported = false;
+    private final boolean isMacSupported = false;
     ArrayList<File> recents = new ArrayList<>();
 
     public DecoderWindow(Stage stage, File file) {
@@ -39,75 +36,105 @@ public class DecoderWindow {
         totalContent.setPadding(new Insets(20, 20, 20, 20));
 
 
-
         try {
-            List<EthernetFrame> frames = decodeFile(file);
+            ObservableList<Line> frameData = FXCollections.observableArrayList();
 
+            List<EthernetFrame> frames = decodeFile(file);
+            List<IpAddress> addresses = new ArrayList<>();
+
+            int i = 0;
             for (EthernetFrame f : frames) {
-                System.out.println(f);
+
+                if (f.getHeader().getType() == EthernetType.IPV4) {
+                    IPv4Frame ip = new IPv4Frame(f.getData().getBytes());
+                    IpAddress sourceAddr = ip.getHeader().getSourceAddress();
+                    IpAddress destinationAddr = ip.getHeader().getDestinationAddress();
+
+                    // pour éviter la duplication d'IP
+                    if (!addresses.contains(sourceAddr)) addresses.add(sourceAddr);
+                    if (!addresses.contains(destinationAddr)) addresses.add(destinationAddr);
+
+                    if (ip.getHeader().getProtocol() == IpProtocol.TCP) {
+                        TcpSegment tcpSegment = new TcpSegment(ip.getData().getBytes());
+                        int sourcePort = tcpSegment.getHeader().getSourcePort();
+                        int destinationPort = tcpSegment.getHeader().getDestinationPort();
+                        HttpData httpData = new HttpData(tcpSegment.getData().getBytes());
+
+                        Line newLine = new Line(i++,
+                                sourceAddr,
+                                sourcePort,
+                                destinationAddr,
+                                destinationPort,
+                                httpData.toString());
+                        frameData.add(newLine);
+                    }
+                }
             }
 
             VBox tableBox = new VBox();
+
             TableView table = new TableView();
+            table.setMaxWidth(800);
             table.setFocusTraversable(false);
             table.setEditable(false);
 
-            TableColumn<EthernetFrame, String> time = new TableColumn<>("Temps");
-            time.setMinWidth(100);
+            TableColumn<Line, String> time = new TableColumn<>("Temps");
+            time.setMaxWidth(100);
             time.setEditable(false);
             time.setResizable(false);
             time.setSortable(false);
             time.setReorderable(false);
 
-            TableColumn<EthernetFrame, String> addrA = new TableColumn<>("IP A");
-            addrA.setMinWidth(300);
-            addrA.setEditable(false);
-            addrA.setResizable(false);
-            addrA.setSortable(false);
-            addrA.setReorderable(false);
-            TableColumn<EthernetFrame, String> addrA1 = new TableColumn<>("");
-            addrA1.setPrefWidth(150);
-            TableColumn<EthernetFrame, String> addrA2 = new TableColumn<>("");
-            addrA2.setPrefWidth(150);
+            List<TableColumn> columns = new ArrayList<>();
+            for (IpAddress ip : addresses) {
 
-            addrA.getColumns().addAll(addrA1, addrA2);
+                TableColumn<Line, String> addrA = new TableColumn<>(ip.toString());
+                addrA.setMinWidth(300);
+                addrA.setEditable(false);
+                addrA.setResizable(false);
+                addrA.setSortable(false);
+                addrA.setReorderable(false);
 
-            TableColumn<EthernetFrame, String> addrB = new TableColumn<>("IP B");
-            addrB.setMinWidth(300);
-            addrB.setEditable(false);
-            addrB.setResizable(false);
-            addrB.setSortable(false);
-            addrB.setReorderable(false);
-            TableColumn<EthernetFrame, String> addrB1 = new TableColumn<>("");
-            addrB1.setPrefWidth(150);
-            TableColumn<EthernetFrame, String> addrB2 = new TableColumn<>("");
-            addrB2.setPrefWidth(150);
+                TableColumn<Line, String> addrA1 = new TableColumn<>("");
+                addrA1.setPrefWidth(150);
 
-            addrB.getColumns().addAll(addrB1, addrB2);
+                TableColumn<Line, String> addrA2 = new TableColumn<>("");
+                addrA2.setPrefWidth(150);
 
-            TableColumn<EthernetFrame, String> comment = new TableColumn<>("Commentaire");
+                addrA.getColumns().addAll(addrA1, addrA2);
+
+                columns.add(addrA);
+            }
+
+            TableColumn<Line, String> comment = new TableColumn<>("Commentaire");
             comment.setPrefWidth(200);
             comment.setEditable(false);
             comment.setResizable(false);
             comment.setSortable(false);
             comment.setReorderable(false);
 
-            table.getColumns().addAll(time, addrA, addrB, comment);
+
+            time.setCellValueFactory(new PropertyValueFactory<>("time"));
+
+            for (TableColumn e : columns) {
+                e.setCellValueFactory(new PropertyValueFactory<>("sourceAddress"));
+            }
+
+            comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
 
-            ScrollPane tablePane = new ScrollPane();
-            tablePane.setFitToWidth(true);
-            tablePane.setFitToHeight(true);
-            tablePane.setFocusTraversable(false);
-            tablePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-            tablePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-            tablePane.setContent(table);
-
-            table.getItems().addAll(frames);
+            table.getColumns().addAll(time);
+            for (TableColumn t : columns) {
+                table.getColumns().add(t);
+            }
+            table.getColumns().addAll(comment);
 
 
+            // on précise les properties
+            table.getItems().addAll(frameData);
 
-            tableBox.getChildren().addAll(tablePane);
+
+            tableBox.getChildren().addAll(table);
 
 
             HBox buttonsBox = new HBox();
@@ -147,95 +174,6 @@ public class DecoderWindow {
         } catch (IOException e) {
             DialogPane error = new DialogPane();
             error.setHeaderText("Erreur");
-        }
-    }
-
-    private void openFile(Stage stage, File file) {
-        try {
-            List<EthernetFrame> frames = decodeFile(file);
-
-            // todo : show every frames
-
-            StackPane root = new StackPane();
-
-
-
-            /*
-            TextField searchText = new TextField();
-            //searchText.setLayoutX(24.0);
-            //searchText.setLayoutY(24.0);
-            searchText.setPrefHeight(35);
-            searchText.setPrefWidth(800);
-            searchText.setPromptText("Entrez votre filtre ici ! Tips : commencez à écrire pour avoir l'auto-completion");
-
-            Button searchButton = new Button();
-            //searchButton.setLayoutX(24.0);
-            //searchButton.setLayoutY(24.0);
-            searchButton.setPrefHeight(35);
-            searchButton.setPrefWidth(100);
-            searchButton.setText("Rechercher");
-            */
-
-            TableView<EthernetFrame> table = new TableView<>();
-
-            table.prefWidth(1080);
-            table.prefHeight(800);
-
-            TableColumn<EthernetFrame, Integer> timeCol = new TableColumn<>("Temps");
-            timeCol.setPrefWidth(100);
-
-            // todo : boucle pour afficher X IP
-
-            TableColumn<EthernetFrame, String> adrrACol = new TableColumn<>("192.168.0.85");
-            adrrACol.setPrefWidth(300);
-
-            TableColumn<EthernetFrame, String> adrrBCol = new TableColumn<>("45.155.169.162");
-            adrrBCol.setPrefWidth(300);
-
-            TableColumn<EthernetFrame, String> commentCol = new TableColumn<>("Commentaire");
-            commentCol.setPrefWidth(200);
-
-            ScrollPane sp = new ScrollPane(table);
-            sp.setFitToHeight(true);
-            sp.setFitToWidth(true);
-
-            table.getColumns().addAll(timeCol, adrrACol, adrrBCol, commentCol);
-            root.getChildren().addAll(table);
-
-            stage.setScene(new Scene(root, 1080, 800));
-
-            for (EthernetFrame f : frames) {
-
-            }
-
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur");
-            alert.setHeaderText("Une erreur s'est produite lors de l'ouverture du fichier !");
-            alert.setContentText(e.getMessage());
-
-            // Create expandable Exception.
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            String exceptionText = sw.toString();
-
-            TextArea textArea = new TextArea(exceptionText);
-            textArea.setEditable(false);
-            textArea.setWrapText(true);
-
-            textArea.setMaxWidth(Double.MAX_VALUE);
-            textArea.setMaxHeight(Double.MAX_VALUE);
-            GridPane.setVgrow(textArea, Priority.ALWAYS);
-            GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-            GridPane expContent = new GridPane();
-            expContent.setMaxWidth(Double.MAX_VALUE);
-            expContent.add(textArea, 0, 1);
-
-            alert.getDialogPane().setExpandableContent(expContent);
-
-            alert.showAndWait();
         }
     }
 
@@ -282,7 +220,7 @@ public class DecoderWindow {
 
                 // on ajoute le contenu de la ligne
                 for (String i : currentLine[1].split(" ")) {
-                    currentFrame.add((byte)Integer.parseInt(i, 16));
+                    currentFrame.add((byte) Integer.parseInt(i, 16));
                 }
 
                 line = bufferedReader.readLine();
@@ -299,6 +237,7 @@ public class DecoderWindow {
     /**
      * Permet de "normaliser" le BufferedReader pour ne prendre
      * en compte que les lignes non-vides
+     *
      * @param reader ancien BufferedReader
      * @return nouveau BufferedReader
      */

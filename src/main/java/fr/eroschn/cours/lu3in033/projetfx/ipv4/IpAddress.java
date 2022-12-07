@@ -1,8 +1,5 @@
 package fr.eroschn.cours.lu3in033.projetfx.ipv4;//package fr.eroschn.cours.lu3in033.projetfx.ipv4;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 public class IpAddress {
 
     private final byte[] bytes;
@@ -14,7 +11,7 @@ public class IpAddress {
 
         StringBuilder sb = new StringBuilder();
         int i;
-        for (i=0; i<bytes.length-1; i++) {
+        for (i = 0; i < bytes.length - 1; i++) {
             sb.append(Byte.toUnsignedInt(bytes[i]) + ".");
         }
         sb.append(Byte.toUnsignedInt(bytes[i]));

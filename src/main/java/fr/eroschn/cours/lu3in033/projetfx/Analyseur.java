@@ -37,8 +37,8 @@ public class Analyseur {
                     lineTab = lineString.split(" ");
 
                     //on recopie les octets dans la trame courante
-                    for (i=3; i<lineTab.length; i++) {
-                        frameBytes[j] = (char)Integer.parseInt(lineTab[i], 16);
+                    for (i = 3; i < lineTab.length; i++) {
+                        frameBytes[j] = (char) Integer.parseInt(lineTab[i], 16);
                         j++;
                     }
 
@@ -48,10 +48,10 @@ public class Analyseur {
                     //on regarde si la ligne suivante appartient à une nouvelle trame ou non
                     //si oui, on filtre la trame courante puis on l'écrit si nécessaire, puis on passe à la lecture de la trame suivante
                     //si non, on continue de lire la trame courante sur la ligne suivante
-                    if ((lineString != null && lineString.startsWith("0000")) || lineString == null) {
+                    if (lineString == null || lineString.startsWith("0000")) {
                         Frame curFrame = new Frame(frameBytes);
 
-                        if (gardeIP(filtre, curFrame.getSourceIP()) == true) {
+                        if (gardeIP(filtre, curFrame.getSourceIP())) {
                             curFrame.writeFrame(bw);
                             bw.write("\n");
                         }
@@ -64,19 +64,15 @@ public class Analyseur {
                 bw.write("\n\n\n--------------- Fin du décodage ---------------\n\n");
                 System.out.println("Ouvrir le fichier 'resultat.txt' pour voir les trames decodees.\n");
                 System.out.println("\n---------- Fin du programme ----------\n\n");
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.err.println(e);
             }
-            
-        }
-        catch (IOException e) {
+
+        } catch (IOException e) {
             System.out.println(e.getMessage());
-        }
-        catch (PatternSyntaxException e) {
+        } catch (PatternSyntaxException e) {
             System.out.println(e.getMessage());
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
 
@@ -93,12 +89,11 @@ public class Analyseur {
 
         String res = "";
         int i;
-        for (i=0; i<bytes.length; i++) {
+        for (i = 0; i < bytes.length; i++) {
             res += bytes[i];
         }
         return res;
     }
-
 
 
     //renvoie true si ip est dans le filtre boolExp, false sinon
@@ -112,15 +107,15 @@ public class Analyseur {
         //on commence par parser le filtre
         String[] filtreSepare = boolExp.split("OU");
         char[][] adressesIP = new char[filtreSepare.length][4]; //tableau des adresses IP passées en ligne de commande
-        
+
         int i = 0;
         for (String exp : filtreSepare) {
             String[] expSeparee = exp.split("=");
             String[] tempOct = expSeparee[1].split("\\.");
-            
+
             int j = 0;
-            for(String oct : tempOct) {
-                adressesIP[i][j] = (char)Integer.parseInt(oct, 10);
+            for (String oct : tempOct) {
+                adressesIP[i][j] = (char) Integer.parseInt(oct, 10);
                 j++;
             }
             i++;
@@ -128,13 +123,12 @@ public class Analyseur {
 
         //on regarde si l'ip passée en paramètre est dans le filtre
         for (char[] ipF : adressesIP) {
-            if (compareBytes(ipF, ip) == true) {
+            if (compareBytes(ipF, ip)) {
                 return true;
             }
         }
         return false;
     }
-
 
 
     //vérifie l'égalité de deux tableaux d'octets
@@ -145,7 +139,7 @@ public class Analyseur {
         }
 
         int i;
-        for(i=0; i<bytes1.length; i++) {
+        for (i = 0; i < bytes1.length; i++) {
             if (bytes1[i] != bytes2[i]) {
                 return false;
             }
@@ -154,17 +148,15 @@ public class Analyseur {
     }
 
 
-
-
     public static void main(String[] args) {
-        
+
         String fichier = args[0];
         String filtre = null;
 
         if (args.length == 2) {
             filtre = args[1];
         }
-    
+
         Analyseur a = new Analyseur();
         a.visualize(fichier, filtre);
 
