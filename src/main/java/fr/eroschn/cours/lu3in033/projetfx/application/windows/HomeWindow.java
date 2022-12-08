@@ -161,7 +161,7 @@ public class HomeWindow {
         openFromFileLabel.setText("Pour ouvrir un fichier");
 
         Button openFromFileButton = new Button();
-        openFromFileButton.setText("⌘O");
+        openFromFileButton.setText((isMacSupported ? "⌘" : "CTRL") + "O");
         openFromFileButton.setCursor(Cursor.HAND);
         openFromFileButton.setFocusTraversable(false);
 
@@ -179,7 +179,7 @@ public class HomeWindow {
         openFromClipboardLabel.setText("Pour ouvrir depuis le presse-papier");
 
         Button openFromClipboardButton = new Button();
-        openFromClipboardButton.setText("⌘L");
+        openFromClipboardButton.setText((isMacSupported ? "⌘" : "CTRL") + "L");
         openFromClipboardButton.setCursor(Cursor.HAND);
         openFromClipboardButton.setFocusTraversable(false);
 

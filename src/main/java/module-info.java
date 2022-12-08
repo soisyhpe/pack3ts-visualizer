@@ -1,7 +1,6 @@
 module fr.eroschn.cours.lu3in033.projetfx {
     requires javafx.controls;
     requires javafx.fxml;
-    requires net.sourceforge.plantuml;
 
 
     exports fr.eroschn.cours.lu3in033.projetfx;
