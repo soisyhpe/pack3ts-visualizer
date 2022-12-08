@@ -14,6 +14,7 @@ public class HttpData {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("[HTTP] ");
         for (byte b : bytes) {
             sb.append((char) b);
         }

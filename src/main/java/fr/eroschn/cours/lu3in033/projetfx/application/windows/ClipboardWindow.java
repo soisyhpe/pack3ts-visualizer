@@ -77,10 +77,11 @@ public class ClipboardWindow {
     }
 
     private File clipboardToFile(String fileName, String content) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("/tmp/" + fileName));
+        String tmpPath = System.getProperty("java.io.tmpdir");
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tmpPath + "/" + fileName));
         bufferedWriter.write(content);
         bufferedWriter.flush();
-        return new File("/tmp/" + fileName);
+        return new File(tmpPath + "/" + fileName);
     }
 
 }

@@ -2,6 +2,7 @@ package fr.eroschn.cours.lu3in033.projetfx.application;
 
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetFrame;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetType;
+import fr.eroschn.cours.lu3in033.projetfx.ipv4.IPv4Frame;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 
 import java.util.ArrayList;
@@ -12,7 +13,6 @@ public class IpAddressTuple {
 
     private final IpAddress firstAddress;
     private final IpAddress secondAddress;
-    private final List<EthernetFrame> frames = new ArrayList<>();
 
     public IpAddressTuple(IpAddress firstAddress, IpAddress secondAddress) {
         this.firstAddress = firstAddress;
@@ -27,10 +27,6 @@ public class IpAddressTuple {
         return secondAddress;
     }
 
-    public List<EthernetFrame> getFrames() {
-        return frames;
-    }
-
     @Override
     public String toString() {
         return "[ " + firstAddress.toString() + ", " + secondAddress.toString() + " ]";
@@ -43,5 +39,32 @@ public class IpAddressTuple {
         if (!(obj instanceof IpAddressTuple)) return false;
         IpAddressTuple a = (IpAddressTuple) obj;
         return a.getFirstAddress().equals(firstAddress) && a.getSecondAddress().equals(secondAddress);
+    }
+    
+    
+    //retourne true si les deux tuples sont similaires au sens de l'égalité ensembliste
+    public boolean isSimilarTo(IpAddressTuple tuple) {
+    	return this.equals(tuple) || this.equals(new IpAddressTuple(tuple.getSecondAddress(), tuple.getFirstAddress()));
+    }
+    
+    //retourne true si la trame a des adresses ip qui correspondent à celle de this (dans un sens ou dans l'autre)
+    public boolean belongsTo(EthernetFrame frame) {
+        IPv4Frame fr = new IPv4Frame(frame.getData().getBytes());
+        IpAddressTuple tuple = new IpAddressTuple(fr.getHeader().getSourceAddress(), fr.getHeader().getDestinationAddress());
+        
+        if(this.isSimilarTo(tuple)) {
+        	return true;
+        }
+        return false;
+    }
+    
+    //retourne true si la liste de paires d'ip contient déjà un tuple similaire à tuple
+    public static boolean containsSimilar(List<IpAddressTuple> list, IpAddressTuple tuple) {
+    	for (IpAddressTuple t : list) {
+    		if (t.isSimilarTo(tuple)) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 }

@@ -28,6 +28,9 @@ public class TcpHeader {
     private final byte[] options; // si dataOffset > 5
 
     public TcpHeader(byte[] bytes) {
+        if (bytes.length < 20) {
+            throw new IllegalArgumentException("L'en-tête TCP est incomplète (< 20 octets)");
+        }
 
         // source port
         sourcePort = ByteUtils.byteArrayToInt(Arrays.copyOfRange(bytes, 0, 2));
@@ -147,8 +150,7 @@ public class TcpHeader {
 
     @Override
     public String toString() {
-        return "Source Port : " + sourcePort
-                + ", Destination Port : " + destinationPort
+        return "[TCP] " + sourcePort + " -> " + destinationPort
                 + ", Sequence Number : " + sequenceNumber
                 + ", Acknowledgement Number : " + acknowledgementNumber
                 + ", THL : " + dataOffset

@@ -4,6 +4,9 @@ import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 
 public class Line {
 
+    private static int cpt = 0;
+
+    private int id;
     private final long time;
     private final IpAddress sourceAddress;
     private final int sourcePort;
@@ -12,20 +15,27 @@ public class Line {
     private final int destinationPort;
     private final String destinationPortString;
     private final String comment;
+    private final String protocols;
 
-    public Line(long time, IpAddress sourceAddress, int sourcePort, IpAddress destinationAddress, int destinationPort, String comment) {
+    public Line(long time, IpAddress sourceAddress, int sourcePort, IpAddress destinationAddress, int destinationPort, String comment, String tcpFlags, String other, String protocols) {
+        id = cpt++;
         this.time = time;
         this.sourceAddress = sourceAddress;
         this.sourcePort = sourcePort;
-        sourcePortString = sourcePort + "[SeqNum : ] --------------------";
+        sourcePortString = tcpFlags + "\n" + sourcePort + " --------------------";
         this.destinationAddress = destinationAddress;
         this.destinationPort = destinationPort;
-        destinationPortString = "--------------------> [SeqNum : ] " + destinationPort;
+        destinationPortString = other + "\n" + "--------------------> " + destinationPort;
         this.comment = comment;
+        this.protocols = protocols;
     }
 
     public long getTime() {
         return time;
+    }
+
+    public String getTimeString() {
+        return String.format("%d", (time / 100000)) + "ms";
     }
 
     public IpAddress getSourceAddress() {
@@ -50,6 +60,10 @@ public class Line {
 
     public String getDestinationPortString() {
         return destinationPortString;
+    }
+
+    public String getProtocols() {
+        return protocols;
     }
 
     public String getComment() {

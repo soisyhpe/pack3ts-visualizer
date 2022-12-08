@@ -1,6 +1,5 @@
 package fr.eroschn.cours.lu3in033.projetfx.application.windows;
 
-import fr.eroschn.cours.lu3in033.projetfx.application.IpAddressTuple;
 import fr.eroschn.cours.lu3in033.projetfx.application.Line;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetFrame;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetType;
@@ -8,7 +7,9 @@ import fr.eroschn.cours.lu3in033.projetfx.http.HttpData;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IPv4Frame;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpProtocol;
+import fr.eroschn.cours.lu3in033.projetfx.tcp.TcpHeader;
 import fr.eroschn.cours.lu3in033.projetfx.tcp.TcpSegment;
+import fr.eroschn.cours.lu3in033.projetfx.utils.FileUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,6 +23,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -44,8 +47,8 @@ public class DecoderWindow {
 
         try {
             ObservableList<Line> frameData = FXCollections.observableArrayList();
-
             List<EthernetFrame> frames = decodeFile(file);
+            long initialeTime = System.nanoTime();
 
             for (EthernetFrame f : frames) {
 
@@ -54,23 +57,36 @@ public class DecoderWindow {
                     IpAddress sourceAddr = ip.getHeader().getSourceAddress();
                     IpAddress destinationAddr = ip.getHeader().getDestinationAddress();
 
-                    //if (isEquivExists(sourceAddr, destinationAddr))
-                    //    continue;
-
                     if (ip.getHeader().getProtocol() == IpProtocol.TCP) {
                         TcpSegment tcpSegment = new TcpSegment(ip.getData().getBytes());
                         int sourcePort = tcpSegment.getHeader().getSourcePort();
                         int destinationPort = tcpSegment.getHeader().getDestinationPort();
                         HttpData httpData = new HttpData(tcpSegment.getData().getBytes());
 
-                        String comment = inlineText(httpData.toString());
+                        String tcpFlags = getTcpFlags(tcpSegment.getHeader());
+                        String httpComment = inlineText(httpData.toString());
 
-                        Line newLine = new Line(System.currentTimeMillis(),
+                        String otherBuilder = "SeqNum : " + tcpSegment.getHeader().getSequenceNumber() + ", " +
+                                "AckNum : " + tcpSegment.getHeader().getAcknowledgementNumber();
+
+                        StringBuilder comment = new StringBuilder();
+                        if (sourcePort == 80 || destinationPort == 80) {
+                            comment.append(httpComment);
+                        } else if (sourcePort == 443 || destinationPort == 443) {
+                            comment.append("[HTTPS] Les données étant chiffrés, [affichage non supporté]");
+                        } else {
+                            comment.append("[UNKNOWN] Protocole inconnu, [affichage non supporté]");
+                        }
+
+                        Line newLine = new Line(System.nanoTime() - initialeTime,
                                 sourceAddr,
                                 sourcePort,
                                 destinationAddr,
                                 destinationPort,
-                                ((sourcePort == 80 || destinationPort == 80) && comment.contains("HTTP") ? "[HTTP] : " + comment : (httpData.getBytes().length == 0 ? "[TCP] : " + tcpSegment.getHeader().toString() : "[TCP] ?")));
+                                comment.toString(),
+                                tcpFlags,
+                                otherBuilder,
+                                listProtocols(f));
                         frameData.add(newLine);
                         lines.add(newLine);
                     }
@@ -95,11 +111,12 @@ public class DecoderWindow {
             time.setSortable(false);
             time.setReorderable(false);
             time.setStyle("-fx-alignment: CENTER-LEFT;");
-            time.setCellValueFactory(new PropertyValueFactory<>("time"));
+            time.setCellValueFactory(new PropertyValueFactory<>("timeString"));
             table.getColumns().addAll(time);
 
             Map<String, List<TableColumn>> map = new HashMap<>();
 
+            int i = 0;
             for (Line l : lines) {
 
                 TableColumn<Line, String> addrA = new TableColumn<>(l.getSourceAddress().toString());
@@ -110,7 +127,7 @@ public class DecoderWindow {
                 addrA.setReorderable(false);
                 addrA.setStyle("-fx-alignment: CENTER-RIGHT;");
                 addrA.setCellValueFactory(new PropertyValueFactory<>("sourcePortString"));
-                table.getColumns().addAll(addrA);
+                table.getColumns().add(addrA);
 
                 TableColumn<Line, String> addrB = new TableColumn<>(l.getDestinationAddress().toString());
                 addrB.setMinWidth(300);
@@ -120,7 +137,7 @@ public class DecoderWindow {
                 addrB.setReorderable(false);
                 addrB.setStyle("-fx-alignment: CENTER-LEFT;");
                 addrB.setCellValueFactory(new PropertyValueFactory<>("destinationPortString"));
-                table.getColumns().addAll(addrB);
+                table.getColumns().add(addrB);
 
 
                 List<TableColumn> list = new ArrayList<>();
@@ -128,32 +145,23 @@ public class DecoderWindow {
                 list.add(addrB);
 
                 map.put(l.getSourceAddress().toString() + ":" + l.getDestinationAddress().toString(), list);
-
-                // todo : draw arrow from source to destination
-                /*
-                // Create a new Polyline object to draw the arrow
-                Polyline arrow = new Polyline();
-
-                // Add the points of the arrow to the Polyline
-                arrow.getPoints().addAll(new Double[]{
-                        x1, y1,   // Starting point of the arrow
-                        x2, y2,   // Ending point of the arrow
-                        xA, yA,   // First point of the arrowhead
-                        x2, y2,   // Back to the ending point of the arrow
-                        xB, yB    // Second point of the arrowhead
-                });
-
-                // Set the stroke style of the arrow to be a solid line
-                arrow.setStroke(Color.BLACK);
-                arrow.setStrokeWidth(1.0);
-                */
-
+                i++;
             }
+
+            TableColumn<Line, String> protocols = new TableColumn<>("Protocoles");
+            protocols.setPrefWidth(100);
+            protocols.setEditable(false);
+            protocols.setResizable(true);
+            protocols.setSortable(false);
+            protocols.setReorderable(false);
+            protocols.setStyle("-fx-alignment: CENTER-LEFT;");
+            protocols.setCellValueFactory(new PropertyValueFactory<>("protocols"));
+            table.getColumns().addAll(protocols);
 
             TableColumn<Line, String> comment = new TableColumn<>("Commentaire");
             comment.setPrefWidth(500);
             comment.setEditable(false);
-            comment.setResizable(false);
+            comment.setResizable(true);
             comment.setSortable(false);
             comment.setReorderable(false);
             comment.setStyle("-fx-alignment: CENTER-LEFT;");
@@ -220,7 +228,16 @@ public class DecoderWindow {
             exportButton.setCursor(Cursor.HAND);
             exportButton.setFocusTraversable(false);
             exportButton.setOnAction((e) -> {
-                exportFile(frames);
+                FileChooser saveFile = new FileChooser();
+
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+                saveFile.getExtensionFilters().add(extFilter);
+
+                File fileToSave = saveFile.showSaveDialog(stage);
+
+                if (fileToSave != null) {
+                    FileUtils.exportFile(frames, fileToSave);
+                }
             });
 
             Button closeButton = new Button();
@@ -233,7 +250,23 @@ public class DecoderWindow {
 
             buttonsBox.getChildren().addAll(searchBox, exportButton, closeButton);
 
-            totalContent.getChildren().addAll(tableBox, buttonsBox);
+            VBox informationsBox = new VBox();
+
+            Label warningTitle = new Label();
+            warningTitle.setText("Informations");
+            warningTitle.setFont(new Font(warningTitle.getFont().getName(), 20));
+
+            Separator informationsSeparator = new Separator();
+
+            Label warningContent = new Label();
+            warningContent.setText("Le champ \"Temps\" correspond au temps émis par l'ordinateur à traiter la trame.\n" +
+                    "Le champ \"Protocole\" correspond au protocole de la couche la plus haute. Protocoles supportés : http, tcp.\n" +
+                    "Le champ \"Commentaire\" correspond aux informations de la couche la plus haute récupérées par le programme. \n" +
+                    "Si la taille des informations de cette colonne dépasse la taille initiale, il faut redimensionner manuellement.");
+
+            informationsBox.getChildren().addAll(warningTitle, informationsSeparator, warningContent);
+
+            totalContent.getChildren().addAll(tableBox, buttonsBox, informationsBox);
 
             stage.setTitle("Visualisateur de trafic - " + file.getName());
             stage.setMinWidth(800);
@@ -275,214 +308,64 @@ public class DecoderWindow {
         }
     }
 
-    public static void exportFile(List<EthernetFrame> frames) {
+    private String listProtocols(EthernetFrame f) {
+        List<String> protocols = new ArrayList<>();
 
-        // la liste d'ip
-        List<IpAddress> addresses = new ArrayList<>();
+        if (f.getHeader().getType().equals(EthernetType.IPV4)) {
+            protocols.add(EthernetType.IPV4.getName());
 
-        // les paires d'ip
-        List<IpAddressTuple> tuples = new ArrayList<>();
+            IPv4Frame ip = new IPv4Frame(f.getData().getBytes());
+            if (ip.getHeader().getProtocol().equals(IpProtocol.TCP)) {
+                protocols.add(IpProtocol.TCP.getName());
 
-        // on récupère la liste d'ip, sans doublons
-        for (EthernetFrame frame : frames) {
-            IPv4Frame ipFrame = new IPv4Frame(frame.getData().getBytes());
-            IpAddress sourceAddress = ipFrame.getHeader().getSourceAddress();
-            IpAddress destinationAddress = ipFrame.getHeader().getDestinationAddress();
+                TcpSegment tcp = new TcpSegment(ip.getData().getBytes());
 
-            IpAddressTuple tuple = new IpAddressTuple(sourceAddress, destinationAddress);
-            tuple.getFrames().add(frame);
-            tuples.add(tuple);
+                HttpData http = new HttpData(ip.getData().getBytes());
+                String inlineHttp =  inlineText(http.toString());
+                if (http.getBytes().length > 0) {
 
-            if (addresses.contains(sourceAddress)) continue;
-            if (addresses.contains(destinationAddress)) continue;
+                    // System.out.println(inlineHttp);
 
-            addresses.add(sourceAddress);
-            addresses.add(destinationAddress);
-        }
-
-        // check
-//        for (IpAddress ip : addresses) {
-//            System.out.println(ip);
-//        }
-
-        System.out.println("avant");
-        for (IpAddressTuple t1 : tuples) {
-            System.out.println(t1);
-        }
-
-        List<IpAddressTuple> nt1 = new ArrayList<>(tuples);
-        List<IpAddressTuple> nt2 = new ArrayList<>(tuples);
-
-        for (IpAddressTuple t1 : nt1) {
-            for (IpAddressTuple t2 : nt2) {
-                if (t1 != t2) {
-                    if (t1.getFirstAddress().equals(t2.getSecondAddress()) && t1.getSecondAddress().equals(t2.getFirstAddress())) {
-
-                        t1.getFrames().addAll(t2.getFrames());
-
-                        tuples.remove(t2);
+                    if (tcp.getHeader().getSourcePort() == 80 || tcp.getHeader().getDestinationPort() == 80) {
+                        protocols.add("HTTP");
+                    } else if (tcp.getHeader().getSourcePort() == 443 || tcp.getHeader().getDestinationPort() == 443) {
+                        protocols.add("HTTPS");
+                    } else {
+                        protocols.add("??");
                     }
                 }
             }
         }
 
-        System.out.println("après");
-        for (IpAddressTuple t1 : tuples) {
-            System.out.println(t1.getFirstAddress() + "                                                               " + t1.getSecondAddress());
-
-            List<EthernetFrame> tupleFrames = t1.getFrames();
-
-            for (EthernetFrame ef : tupleFrames) {
-                IPv4Frame ip = new IPv4Frame(ef.getData().getBytes());
-                TcpSegment tcp = new TcpSegment(ip.getData().getBytes());
-
-                if (ip.getHeader().getSourceAddress().equals(t1.getFirstAddress())) {
-                    System.out.println(tcp.getHeader().getSourcePort() + "----------------------------------------------------------------------------->" + tcp.getHeader().getDestinationPort());
-                } else if (ip.getHeader().getSourceAddress().equals(t1.getSecondAddress())) {
-                    System.out.println(tcp.getHeader().getDestinationPort() + "<-----------------------------------------------------------------------------" + tcp.getHeader().getSourcePort());
-                }
-
-            }
-        }
-
-
-
-//        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/flux.txt"))) {
-//            bw.write("\n---------------------------------- Analyse des flux ----------------------------------\n\n");
-//            System.out.println("Fichier exporté");
-//
-//            List<IpAddress[]> listIps = new ArrayList<>();
-//            IpAddress ip1 = null;
-//            IpAddress ip2 = null;
-//
-//            //on commence par récupérer la liste des paires d'IP de la trace
-//            int i = 0;
-//            for (EthernetFrame frame : frames) {
-//                ip1 = new IPv4Frame(frame.getData().getBytes()).getHeader().getSourceAddress();
-//                ip2 = new IPv4Frame(frame.getData().getBytes()).getHeader().getDestinationAddress();
-//                IpAddress[] duoIps = new IpAddress[2];
-//                duoIps[0] = ip1;
-//                duoIps[1] = ip2;
-//                listIps.add(duoIps);
-//            }
-//
-//            //on retire les doublons de la liste
-//            List<IpAddress[]> listIpsCopy = List.copyOf(listIps);
-//            //System.out.println(listIps.size());
-//
-//          /*
-//          for (IpAddress[] duoIps1 : listIps) {
-//
-//          }
-//          */
-//
-//            for (IpAddress[] duoIps1 : listIpsCopy) {
-//                for (IpAddress[] duoIps2 : listIpsCopy) {
-//                    if (duoIps1 != duoIps2
-//                            && ((duoIps1[0].equals(duoIps2[0]) && duoIps1[1].equals(duoIps2[1]))
-//                            || (duoIps1[0].equals(duoIps2[0]) && duoIps1[1].equals(duoIps2[1])))) {
-//                        System.out.println(" ip1 = " + duoIps1[0] + " ip2 = " + duoIps1[1]);
-//                        System.out.println("removing : ip1 = " + duoIps2[0] + " ip2 = " + duoIps2[1]);
-//                        listIps.remove(duoIps2);
-//                    }
-//                }
-//            }
-//
-//            //System.out.println(listIps.size());
-//
-//            //((duoIps1[0] == duoIps2[0] && duoIps1[1] == duoIps2[1]) || (duoIps1[0] == duoIps2[1] && duoIps1[0] == duoIps2[1])))
-//
-//            List<IpAddress> tmp = new ArrayList<>();
-//
-//            //pour chaque paire d'IP on écrit le flux de trames correspondant
-//            for (IpAddress[] duoIps : listIps) {
-//                bw.write("\n\n\n" + duoIps[0].toString()
-//                        + " "
-//                        + duoIps[1].toString() + "\n\n");
-//
-//                for (EthernetFrame frame : frames) {
-//
-//                    if (belongsTo(frame, duoIps) == true) {
-//
-//                        //if (tmp.contains(duoIps[0]) && tmp.contains(duoIps[1])) continue;
-//
-//                        IPv4Frame fr = new IPv4Frame(frame.getData().getBytes());
-//                        TcpSegment seg = new TcpSegment(fr.getData().getBytes());
-//
-//                        bw.write(" ");
-//                        if (seg.getHeader().isSyn() == 1) {
-//                            bw.write("[SYN]");
-//                        }
-//                        if (seg.getHeader().isAck() == 1) {
-//                            bw.write("[ACK]");
-//                        }
-//                        if (seg.getHeader().isFin() == 1) {
-//                            bw.write("[FIN]");
-//                        }
-//                        if (seg.getHeader().isRst() == 1) {
-//                            bw.write("[RST]");
-//                        }
-//                        if (seg.getHeader().isPsh() == 1) {
-//                            bw.write("[PSH]");
-//                        }
-//                        if (seg.getHeader().isUrg() == 1) {
-//                            bw.write("[URG]");
-//                        }
-//
-//                        bw.write(" Seq=" + (seg.getHeader().getSequenceNumber()));
-//                        if (seg.getHeader().isAck() == 1) {
-//                            bw.write(" Ack=" + (seg.getHeader().getAcknowledgementNumber()));
-//                        }
-//                        bw.write(" Win=" + (seg.getHeader().getWindow()));
-//                        bw.write(" Len=" + (seg.getData().getBytes().length));
-//
-//                        tmp.add(duoIps[0]);
-//                        tmp.add(duoIps[1]);
-//
-//                        if (duoIps[0].equals(fr.getHeader().getSourceAddress())) {
-//                            bw.write("\n " + (seg.getHeader().getSourcePort()));
-//                            bw.write(" ----------------------------------------------------------------------------->");
-//                            bw.write(" " + (seg.getHeader().getDestinationPort()));
-//                            bw.write("\n\n");
-//                        } else if (duoIps[1].equals(fr.getHeader().getSourceAddress())) {
-//                            bw.write("\n " + (seg.getHeader().getDestinationPort()));
-//                            bw.write(" <-----------------------------------------------------------------------------");
-//                            bw.write(" " + (seg.getHeader().getSourcePort()) + " ");
-//                            bw.write("\n\n");
-//                        }
-//                        //}
-//                    }
-//                }
-//
-//                bw.write("\n\n\n----------------------------------- Fin des flux -----------------------------------\n\n");
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        return listToSB(protocols, "️ >", false).toString();
     }
 
-    public static boolean belongsTo(EthernetFrame frame, IpAddress[] duoIps) {
-        IPv4Frame fr = new IPv4Frame(frame.getData().getBytes());
+    private String getTcpFlags(TcpHeader tcpHeader) {
+        List<String> flagsTcp = new ArrayList<>();
 
-        if ((fr.getHeader().getSourceAddress().equals(duoIps[0]) && fr.getHeader().getDestinationAddress().equals(duoIps[1]))
-                || (fr.getHeader().getSourceAddress().equals(duoIps[1]) && fr.getHeader().getDestinationAddress().equals(duoIps[0]))) {
-            return true;
-        }
-        return false;
+        if (tcpHeader.isUrg() == 1) flagsTcp.add("URG");
+        if (tcpHeader.isAck() == 1) flagsTcp.add("ACK");
+        if (tcpHeader.isPsh() == 1) flagsTcp.add("PSH");
+        if (tcpHeader.isRst() == 1) flagsTcp.add("RST");
+        if (tcpHeader.isSyn() == 1) flagsTcp.add("SYN");
+        if (tcpHeader.isFin() == 1) flagsTcp.add("FIN");
+
+        StringBuilder flagsBuilder = listToSB(flagsTcp, ",", true);
+        return flagsBuilder.toString().equalsIgnoreCase("[]") ? "" : flagsBuilder.toString();
     }
 
-    private boolean isEquivExists(IpAddress sourceAddress, IpAddress destinationAddress) {
-        for (Line l : lines) {
-
-            if (l.getSourceAddress().equals(sourceAddress) && l.getDestinationAddress().equals(destinationAddress))
-                return true;
-
-            if (l.getSourceAddress().equals(destinationAddress) && l.getDestinationAddress().equals(sourceAddress))
-                return true;
-
+    private StringBuilder listToSB(List<String> list, String separator, boolean brackets) {
+        StringBuilder sb = new StringBuilder();
+        if (brackets) sb.append("[");
+        int i = 0;
+        for (String flag : list) {
+            sb.append(flag);
+            if (i < list.size() - 1) sb.append(separator).append(" ");
+            i++;
         }
+        if (brackets) sb.append("]");
 
-        return false;
+        return sb;
     }
 
     private String inlineText(String initialText) {
@@ -527,20 +410,20 @@ public class DecoderWindow {
                     if (oe.length > 0) {
 
                         EthernetFrame ethernetFrame = new EthernetFrame(toByteTab(currentFrame));
-                        System.out.println("\n\n\nDEBUG : \n" + ethernetFrame);
+                        // System.out.println("\n\n\nDEBUG : \n" + ethernetFrame);
 
                         if (ethernetFrame.getHeader().getType() == EthernetType.IPV4) {
 
                             IPv4Frame ipFrame = new IPv4Frame(ethernetFrame.getData().getBytes());
-                            System.out.println("\nDEBUG : \n" + ipFrame);
+                            // System.out.println("\nDEBUG : \n" + ipFrame);
 
                             if (ipFrame.getHeader().getProtocol() == IpProtocol.TCP) {
 
                                 TcpSegment tcpSeg = new TcpSegment(ipFrame.getData().getBytes());
-                                System.out.println("\nDEBUG : \n" + tcpSeg);
+                                // System.out.println("\nDEBUG : \n" + tcpSeg);
 
                                 HttpData appData = new HttpData(tcpSeg.getData().getBytes());
-                                System.out.println("\nDEBUG : \nDonees applicatives : " + appData);
+                                // System.out.println("\nDEBUG : \nDonees applicatives : " + appData);
                             }
 
                         }

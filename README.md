@@ -15,3 +15,12 @@ L'ensemble de ces classes nous permettent d'obtenir différents objets.
 
 
 ### Visualisateur de trafic réseau
+
+## Bugs connus
+
+---
+
+Voici, ci-dessous, une liste des bugs / dysfonctionnements connus :
+
+- [[bug-1](https://github.com/)] l'affichage des trames dans le visualisateur graphique provoque des duplications de lignes
+- [[bug-2]()] 

@@ -27,6 +27,10 @@ public class IPv4Header {
 
     public IPv4Header(byte[] bytes) {
 
+        if (bytes.length < 20) {
+            throw new IllegalArgumentException("L'en-tête IPv4 est incomplète (< 20 octets)");
+        }
+
         // version
         version = ((int) bytes[0]) / 16;
 

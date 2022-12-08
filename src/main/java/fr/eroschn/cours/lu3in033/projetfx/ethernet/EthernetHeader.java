@@ -11,6 +11,10 @@ public class EthernetHeader {
     private final EthernetType type;
 
     public EthernetHeader(byte[] bytes) {
+        if (bytes.length < 14) {
+            throw new IllegalArgumentException("L'en-tête ethernet est incomplète (< 14 octets)");
+        }
+
         // on récupère l'adress mac destination
         destination = new MacAddress(Arrays.copyOfRange(bytes, 0, 6));
 
