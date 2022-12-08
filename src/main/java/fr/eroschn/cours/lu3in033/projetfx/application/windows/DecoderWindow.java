@@ -516,7 +516,7 @@ public class DecoderWindow {
 
             while (line != null) {
 
-                currentLine = line.split("   ");
+                currentLine = line.contains("   ") ? line.split("   ") : line.split("  ");
                 currentOffset = currentLine[0];
 
                 // nouvelle trame, on sauvegarde la précédente
