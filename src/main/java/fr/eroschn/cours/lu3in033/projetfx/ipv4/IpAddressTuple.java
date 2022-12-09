@@ -1,8 +1,6 @@
-package fr.eroschn.cours.lu3in033.projetfx.application;
+package fr.eroschn.cours.lu3in033.projetfx.ipv4;
 
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetFrame;
-import fr.eroschn.cours.lu3in033.projetfx.ipv4.IPv4Frame;
-import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 
 import java.util.List;
 

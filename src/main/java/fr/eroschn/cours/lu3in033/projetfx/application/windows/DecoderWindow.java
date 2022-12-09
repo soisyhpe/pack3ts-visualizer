@@ -1,6 +1,6 @@
 package fr.eroschn.cours.lu3in033.projetfx.application.windows;
 
-import fr.eroschn.cours.lu3in033.projetfx.application.Line;
+import fr.eroschn.cours.lu3in033.projetfx.utils.Line;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetFrame;
 import fr.eroschn.cours.lu3in033.projetfx.ethernet.EthernetType;
 import fr.eroschn.cours.lu3in033.projetfx.http.HttpData;
@@ -205,10 +205,10 @@ public class DecoderWindow {
             searchBar.textProperty().addListener((obs, oldValue, newValue) -> {
                 switch (choiceBox.getValue()) {
                     case "port source":
-                        filteredList.setPredicate(p -> (p.getSourcePort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        filteredList.setPredicate(p -> (p.getSourcePort() + "").toLowerCase().equalsIgnoreCase(newValue.toLowerCase().trim()));
                         break;
                     case "port destination":
-                        filteredList.setPredicate(p -> (p.getDestinationPort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        filteredList.setPredicate(p -> (p.getDestinationPort() + "").toLowerCase().equalsIgnoreCase(newValue.toLowerCase().trim()));
                         break;
                     case "protocole":
                         filteredList.setPredicate(p -> (p.getProtocols() + "").toLowerCase().contains(newValue.toLowerCase().trim()));

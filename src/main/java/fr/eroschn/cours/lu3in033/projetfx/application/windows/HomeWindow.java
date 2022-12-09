@@ -122,7 +122,9 @@ public class HomeWindow {
         try {
             ImageView welcomeLogo = new ImageView();
 
-            Image logo = new Image(new FileInputStream("data/logo-background.png"));
+            ClassLoader classLoader = getClass().getClassLoader();
+            String imageUrl = classLoader.getResource("images/logo.png").toExternalForm();
+            Image logo = new Image(imageUrl);
 
             welcomeLogo.setImage(logo);
             welcomeLogo.setFitHeight(100);

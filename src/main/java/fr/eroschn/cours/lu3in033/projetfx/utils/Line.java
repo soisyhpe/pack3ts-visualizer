@@ -1,4 +1,4 @@
-package fr.eroschn.cours.lu3in033.projetfx.application;
+package fr.eroschn.cours.lu3in033.projetfx.utils;
 
 import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 
