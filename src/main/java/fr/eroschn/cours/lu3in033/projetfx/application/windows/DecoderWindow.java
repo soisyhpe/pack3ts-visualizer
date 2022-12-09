@@ -193,12 +193,12 @@ public class DecoderWindow {
             searchBox.setAlignment(Pos.BOTTOM_LEFT);
             searchBox.setSpacing(5);
 
-            ChoiceBox<String> choiceBox = new ChoiceBox<>();
-            choiceBox.getItems().addAll("port source", "port destination");
-            choiceBox.setValue("Aucun filtre");
+            ComboBox<String> choiceBox = new ComboBox<>();
+            choiceBox.getItems().addAll("port source", "port destination", "protocole");
+            choiceBox.setValue("Aucun filtre...");
 
             TextField searchBar = new TextField();
-            searchBar.setPromptText("Précisez votre filtre ici. Tips : écrivez pour avoir l'auto-complétion");
+            searchBar.setPromptText("Précisez la valeur correspondant à votre filtre ici !");
             searchBar.setFocusTraversable(false);
             searchBar.setPrefWidth(300);
 
@@ -209,6 +209,9 @@ public class DecoderWindow {
                         break;
                     case "port destination":
                         filteredList.setPredicate(p -> new String(p.getDestinationPort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        break;
+                    case "protocole":
+                        filteredList.setPredicate(p -> new String(p.getProtocols() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
                         break;
                 }
             });
@@ -230,10 +233,10 @@ public class DecoderWindow {
             exportButton.setOnAction((e) -> {
                 FileChooser saveFile = new FileChooser();
 
-                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-                saveFile.getExtensionFilters().add(extFilter);
+                saveFile.setTitle("Exporter vers un fichier");
+                saveFile.setInitialFileName("promethee_spathis.txt");
 
-                File fileToSave = saveFile.showSaveDialog(stage);
+                File fileToSave = saveFile.showSaveDialog(new Stage());
 
                 if (fileToSave != null) {
                     FileUtils.exportFile(frames, fileToSave);

@@ -6,6 +6,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -13,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.StringWriter;
 
 public class HomeWindow {
@@ -123,17 +126,30 @@ public class HomeWindow {
         welcomeBox.setAlignment(Pos.CENTER);
         welcomeBox.setPadding(new Insets(10, 0, 25, 0));
 
-        Label welcomeTitle = new Label();
-        welcomeTitle.setText("Decoder");
-        welcomeTitle.setCursor(Cursor.DEFAULT);
-        welcomeTitle.setFont(new Font(welcomeTitle.getFont().getName(), 35));
+        try {
+            ImageView welcomeLogo = new ImageView();
 
-        Label welcomeText = new Label();
-        welcomeText.setText("Visualisateur de trafic réseau");
-        welcomeText.setCursor(Cursor.DEFAULT);
-        welcomeText.setFont(new Font(welcomeText.getFont().getName(), 15));
+            Image logo = new Image(new FileInputStream("data/logo-background.png"));
 
-        welcomeBox.getChildren().addAll(welcomeTitle, welcomeText);
+            welcomeLogo.setImage(logo);
+            welcomeLogo.setFitHeight(100);
+            welcomeLogo.setPreserveRatio(true);
+            welcomeLogo.setCursor(Cursor.DEFAULT);
+
+            welcomeBox.getChildren().addAll(welcomeLogo);
+        } catch (Exception e) {
+            Label welcomeTitle = new Label();
+            welcomeTitle.setText("Pack3t Visualizer");
+            welcomeTitle.setCursor(Cursor.DEFAULT);
+            welcomeTitle.setFont(new Font(welcomeTitle.getFont().getName(), 35));
+
+            Label welcomeText = new Label();
+            welcomeText.setText("Visualisateur de trafic réseau");
+            welcomeText.setCursor(Cursor.DEFAULT);
+            welcomeText.setFont(new Font(welcomeText.getFont().getName(), 15));
+
+            welcomeBox.getChildren().addAll(welcomeTitle, welcomeText);
+        }
 
 
 
@@ -241,7 +257,7 @@ public class HomeWindow {
 
         box.getChildren().addAll(welcomeBox, startingBox, aboutBox);
 
-        stage.setTitle("Decoder");
+        stage.setTitle("Pack3t Visualizer");
         stage.setMinWidth(1080);
         stage.setMinHeight(800);
         stage.setResizable(false);

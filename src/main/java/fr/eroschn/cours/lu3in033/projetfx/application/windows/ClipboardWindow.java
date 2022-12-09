@@ -19,7 +19,7 @@ public class ClipboardWindow {
 
     public ClipboardWindow(Stage stage, String clipboardContent) {
 
-        stage.setTitle("Decoder");
+        stage.setTitle("Importer depuis le presse-papier");
         stage.setMinWidth(800);
         stage.setMinHeight(600);
         stage.setResizable(false);
