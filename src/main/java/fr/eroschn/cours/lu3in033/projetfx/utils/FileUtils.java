@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtils {
+
     public static void exportFile(List<EthernetFrame> frames, File fileToSave) {
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileToSave))) {
@@ -37,7 +38,7 @@ public class FileUtils {
             List<IpAddressTuple> listIpsSD = new ArrayList<>();
 
             for (IpAddressTuple tuple : listIps) {
-                if (!IpAddressTuple.containsSimilar(listIpsSD, tuple)) {
+                if (IpAddressTuple.containsSimilar(listIpsSD, tuple) == false) {
                     listIpsSD.add(tuple);
                 }
             }
@@ -45,56 +46,55 @@ public class FileUtils {
             //pour chaque paire d'IP on écrit le flux de trames correspondant
             for (IpAddressTuple tuple : listIpsSD) {
                 bw.write("\n\n\n\n" + tuple.getFirstAddress().toString()
-                        + "                                                                                   "
+                        + "\t\t\t\t\t\t\t\t\t\t\t"
                         + tuple.getSecondAddress().toString() + "\n\n");
 
                 for (EthernetFrame frame : frames) {
 
                     IPv4Frame fr = new IPv4Frame(frame.getData().getBytes());
-                    TcpSegment seg = new TcpSegment(fr.getData().getBytes());
 
-                    if (tuple.belongsTo(frame)) {
+                    if (tuple.belongsTo(frame) == true) {
+                        TcpSegment seg = new TcpSegment(fr.getData().getBytes());
+                        int srcPort = seg.getHeader().getSourcePort();
+                        int dstPort = seg.getHeader().getDestinationPort();
+                        IpAddress srcIp = fr.getHeader().getSourceAddress();
 
-                        bw.write("           ");
-                        if (seg.getHeader().isSyn() == 1) {
-                            bw.write("[SYN]");
-                        }
-                        if (seg.getHeader().isAck() == 1) {
-                            bw.write("[ACK]");
-                        }
-                        if (seg.getHeader().isFin() == 1) {
-                            bw.write("[FIN]");
-                        }
-                        if (seg.getHeader().isRst() == 1) {
-                            bw.write("[RST]");
-                        }
-                        if (seg.getHeader().isPsh() == 1) {
-                            bw.write("[PSH]");
-                        }
-                        if (seg.getHeader().isUrg() == 1) {
-                            bw.write("[URG]");
+
+                        bw.write("             ");
+                        if (srcPort == 80 ) {
+                            for (byte b : seg.getData().getBytes()) {
+                                if (Byte.toUnsignedInt(b) == 10) {break;}
+                                bw.write((char)b);
+                            }
+                        } else {
+                            writeFlags(bw, seg);
                         }
 
-                        bw.write(" Seq=" + (seg.getHeader().getSequenceNumber()));
-
-                        if (seg.getHeader().isAck() == 1) {
-                            bw.write(" Ack=" + (seg.getHeader().getAcknowledgementNumber()));
-                        }
-
-                        bw.write(" Win=" + (seg.getHeader().getWindow()));
-                        bw.write(" Len=" + (seg.getData().getBytes().length));
-
-                        if (tuple.getFirstAddress().equals(fr.getHeader().getSourceAddress())) {
-                            bw.write("\n   " + (seg.getHeader().getSourcePort()));
+                        if (tuple.getFirstAddress().equals(srcIp)) {
+                            bw.write("\n   " + srcPort);
                             bw.write(" ------------------------------------------------------------------------------------------>");
-                            bw.write(" " + (seg.getHeader().getDestinationPort()));
-                            bw.write("\n\n");
-                        } else if (tuple.getSecondAddress().equals(fr.getHeader().getSourceAddress())) {
-                            bw.write("\n   " + (seg.getHeader().getDestinationPort()));
-                            bw.write(" <------------------------------------------------------------------------------------------");
-                            bw.write(" " + (seg.getHeader().getSourcePort()) + " ");
-                            bw.write("\n\n");
+                            bw.write(" " + dstPort);
                         }
+                        else if (tuple.getSecondAddress().equals(srcIp)) {
+                            bw.write("\n   " + dstPort);
+                            bw.write(" <------------------------------------------------------------------------------------------");
+                            bw.write(" " + srcPort);
+                        }
+
+                        if (srcPort == 80) {
+                            bw.write("       HTTP: ");
+                            for (byte b : seg.getData().getBytes()) {
+                                if (Byte.toUnsignedInt(b) == 10) {break;}
+                                bw.write((char)b);
+                            }
+                        }
+                        else {
+                            bw.write("       TCP: ");
+                            bw.write((seg.getHeader().getSourcePort()) + "->" + (seg.getHeader().getDestinationPort()) + " ");
+                            writeFlags(bw, seg);
+                        }
+
+                        bw.write("\n\n");
 
                     } //fin if belongs
 
@@ -107,5 +107,21 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void writeFlags(BufferedWriter bw, TcpSegment seg) throws IOException {
+        if (seg.getHeader().isSyn() == 1) {bw.write("[SYN]");}
+        if (seg.getHeader().isAck() == 1) {bw.write("[ACK]");}
+        if (seg.getHeader().isFin() == 1) {bw.write("[FIN]");}
+        if (seg.getHeader().isRst() == 1) {bw.write("[RST]");}
+        if (seg.getHeader().isPsh() == 1) {bw.write("[PSH]");}
+        if (seg.getHeader().isUrg() == 1) {bw.write("[URG]");}
+
+        bw.write(" Seq=" + (seg.getHeader().getSequenceNumber()));
+        if (seg.getHeader().isAck() == 1) {
+            bw.write(" Ack=" + (seg.getHeader().getAcknowledgementNumber()));
+        }
+        bw.write(" Win=" + (seg.getHeader().getWindow()));
+        bw.write(" Len=" + (seg.getData().getBytes().length));
     }
 }
