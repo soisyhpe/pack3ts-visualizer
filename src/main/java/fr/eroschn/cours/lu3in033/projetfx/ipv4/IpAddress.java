@@ -33,8 +33,7 @@ public class IpAddress {
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (obj == this) return true;
-        if (!(obj instanceof IpAddress)) return false;
-        IpAddress a = (IpAddress) obj;
+        if (!(obj instanceof IpAddress a)) return false;
         return Arrays.equals(a.getBytes(), this.getBytes());
     }
 }

@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 public class DecoderWindow {
 
-    private List<Line> lines = new ArrayList<>();
+    private final List<Line> lines = new ArrayList<>();
 
     public DecoderWindow(Stage stage, File file) {
 
@@ -205,13 +205,13 @@ public class DecoderWindow {
             searchBar.textProperty().addListener((obs, oldValue, newValue) -> {
                 switch (choiceBox.getValue()) {
                     case "port source":
-                        filteredList.setPredicate(p -> new String(p.getSourcePort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        filteredList.setPredicate(p -> (p.getSourcePort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
                         break;
                     case "port destination":
-                        filteredList.setPredicate(p -> new String(p.getDestinationPort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        filteredList.setPredicate(p -> (p.getDestinationPort() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
                         break;
                     case "protocole":
-                        filteredList.setPredicate(p -> new String(p.getProtocols() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
+                        filteredList.setPredicate(p -> (p.getProtocols() + "").toLowerCase().contains(newValue.toLowerCase().trim()));
                         break;
                 }
             });
@@ -324,7 +324,7 @@ public class DecoderWindow {
                 TcpSegment tcp = new TcpSegment(ip.getData().getBytes());
 
                 HttpData http = new HttpData(ip.getData().getBytes());
-                String inlineHttp =  inlineText(http.toString());
+                String inlineHttp = inlineText(http.toString());
                 if (http.getBytes().length > 0) {
 
                     // System.out.println(inlineHttp);

@@ -5,8 +5,6 @@ import fr.eroschn.cours.lu3in033.projetfx.ipv4.IpAddress;
 public class Line {
 
     private static int cpt = 0;
-
-    private int id;
     private final long time;
     private final IpAddress sourceAddress;
     private final int sourcePort;
@@ -16,6 +14,7 @@ public class Line {
     private final String destinationPortString;
     private final String comment;
     private final String protocols;
+    private final int id;
 
     public Line(long time, IpAddress sourceAddress, int sourcePort, IpAddress destinationAddress, int destinationPort, String comment, String tcpFlags, String other, String protocols) {
         id = cpt++;

@@ -109,6 +109,22 @@ public class Frame {
         return res;
     }
 
+    //retourne un String représentant une adresse IP au format standard
+    public static String IPAdressToString(char[] bytes) {
+        if (bytes == null) {
+            System.out.print("IPAdressToString() : pas d'IP");
+            //lancer une exception ?
+            return null;
+        }
+
+        String res = "";
+        int i;
+        for (i = 0; i < bytes.length - 1; i++) {
+            res += (int) bytes[i] + ".";
+        }
+        res += (int) bytes[i];
+        return res;
+    }
 
     //écrit une trame dans un fichier dans un format "lisible"
     public void writeFrame(BufferedWriter bw) {
@@ -145,25 +161,6 @@ public class Frame {
             System.err.println(e);
         }
     }
-
-
-    //retourne un String représentant une adresse IP au format standard
-    public static String IPAdressToString(char[] bytes) {
-        if (bytes == null) {
-            System.out.print("IPAdressToString() : pas d'IP");
-            //lancer une exception ?
-            return null;
-        }
-
-        String res = "";
-        int i;
-        for (i = 0; i < bytes.length - 1; i++) {
-            res += (int) bytes[i] + ".";
-        }
-        res += (int) bytes[i];
-        return res;
-    }
-
 
     //retourne l'adresse IP source
     public char[] getSourceIP() {

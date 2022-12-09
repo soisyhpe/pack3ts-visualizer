@@ -6,12 +6,12 @@ import javafx.stage.Stage;
 
 public class DecoderApplication extends Application {
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         new HomeWindow(stage, getHostServices());
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

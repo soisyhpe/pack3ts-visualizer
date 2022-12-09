@@ -8,7 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -16,7 +19,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.StringWriter;
 
 public class HomeWindow {
 
@@ -25,11 +27,9 @@ public class HomeWindow {
     public HomeWindow(Stage stage, HostServices hostServices) {
 
 
-
         // on récupère les infos de l'os
         final String os = System.getProperty("os.name");
         if (os != null && os.startsWith("Mac")) isMacSupported = true;
-
 
 
         Menu fileMenu = new Menu("Fichier");
@@ -46,7 +46,6 @@ public class HomeWindow {
         });
 
 
-
         Menu recentsMenu = new Menu("Ouvrir l'élément récent");
 
         MenuItem item = new MenuItem("(vide)");
@@ -58,14 +57,13 @@ public class HomeWindow {
         MenuItem clearHistoric = new MenuItem("Effacer l'historique");
         // clearHistoric.setDisable(true);
 
-        clearHistoric.setOnAction((e) -> {});
+        clearHistoric.setOnAction((e) -> {
+        });
 
         recentsMenu.getItems().add(clearHistoric);
 
 
-
         SeparatorMenuItem s1 = new SeparatorMenuItem();
-
 
 
         Menu importMenu = new Menu("Importer...");
@@ -84,14 +82,11 @@ public class HomeWindow {
         importMenu.getItems().add(clipboardItem);
 
 
-
         MenuItem exportItem = new MenuItem("Exporter");
         exportItem.setDisable(true);
 
 
-
         SeparatorMenuItem s2 = new SeparatorMenuItem();
-
 
 
         MenuItem closeItem = new MenuItem("Fermer");
@@ -106,7 +101,6 @@ public class HomeWindow {
         });
 
 
-
         fileMenu.getItems().addAll(openItem, recentsMenu, s1, importMenu, exportItem, s2, closeItem);
 
         MenuBar menuBar = new MenuBar(fileMenu);
@@ -114,7 +108,6 @@ public class HomeWindow {
 
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(menuBar);
-
 
 
         VBox box = new VBox(menuBar);
@@ -150,7 +143,6 @@ public class HomeWindow {
 
             welcomeBox.getChildren().addAll(welcomeTitle, welcomeText);
         }
-
 
 
         VBox startingBox = new VBox();
@@ -210,7 +202,6 @@ public class HomeWindow {
         startingBox.getChildren().addAll(explanationTitle, explanationSeparator, explanationBox);
 
 
-
         VBox aboutBox = new VBox();
         aboutBox.setAlignment(Pos.CENTER);
         aboutBox.setPadding(new Insets(10, 0, 25, 0));
@@ -252,7 +243,6 @@ public class HomeWindow {
         aboutLinksBox.getChildren().addAll(manual, presentation, sourceCode);
 
         aboutBox.getChildren().addAll(aboutTitle, aboutSeparator, aboutLinksBox);
-
 
 
         box.getChildren().addAll(welcomeBox, startingBox, aboutBox);

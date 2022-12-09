@@ -15,19 +15,19 @@ public enum IpProtocol {
         this.name = name;
     }
 
+    public static IpProtocol fromValue(int value) {
+        for (IpProtocol p : values()) {
+            if (p.value == value) return p;
+        }
+        throw new IllegalArgumentException("Impossible de retrouver ce protocole ip : " + value);
+    }
+
     public int getValue() {
         return value;
     }
 
     public String getName() {
         return name;
-    }
-
-    public static IpProtocol fromValue(int value) {
-        for (IpProtocol p : values()) {
-            if (p.value == value) return p;
-        }
-        throw new IllegalArgumentException("Impossible de retrouver ce protocole ip : " + value);
     }
 
     @Override

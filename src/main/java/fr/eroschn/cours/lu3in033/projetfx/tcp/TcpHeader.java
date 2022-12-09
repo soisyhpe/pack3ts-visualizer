@@ -24,8 +24,8 @@ public class TcpHeader {
     private final int window;
     private final int checksum;
     private final int urgentPointer;
-    private String options_ = "non";
     private final byte[] options; // si dataOffset > 5
+    private String options_ = "non";
 
     public TcpHeader(byte[] bytes) {
         if (bytes.length < 20) {

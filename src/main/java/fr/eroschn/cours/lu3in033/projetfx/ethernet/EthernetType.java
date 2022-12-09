@@ -14,14 +14,6 @@ public enum EthernetType {
         this.name = name;
     }
 
-    public long getValue() {
-        return value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     /**
      * Permet de convertir un short (2 octets) en un type ethernet
      *
@@ -33,6 +25,14 @@ public enum EthernetType {
             if (ethernetType.value == value) return ethernetType;
         }
         throw new IllegalArgumentException("Le type ethernet fourni n'existe pas : " + value);
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

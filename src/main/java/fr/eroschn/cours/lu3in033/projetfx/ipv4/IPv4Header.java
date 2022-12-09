@@ -22,8 +22,8 @@ public class IPv4Header {
     private final int headerChecksum;
     private final IpAddress sourceAddress;
     private final IpAddress destinationAddress;
-    private String options_ = "non";
     private final List<IpOption> options; // si IHL > 5
+    private String options_ = "non";
 
     public IPv4Header(byte[] bytes) {
 

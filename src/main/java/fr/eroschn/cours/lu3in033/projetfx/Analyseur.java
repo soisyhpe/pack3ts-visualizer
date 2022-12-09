@@ -6,6 +6,52 @@ import java.util.regex.PatternSyntaxException;
 public class Analyseur {
     static final int FRAME_SIZE = 1550; //taille max d'une trame Ethernet (en octets)
 
+    //retourne un String représentant les octets passés en paramètre comme des caractères ASCII
+    public static String bytesToStringAscii(char[] bytes) {
+        if (bytes == null) {
+            System.out.println("bytesToStringAscii() : pas d'octets");
+            //lancer une exception ?
+            return null;
+        }
+
+        String res = "";
+        int i;
+        for (i = 0; i < bytes.length; i++) {
+            res += bytes[i];
+        }
+        return res;
+    }
+
+    //vérifie l'égalité de deux tableaux d'octets
+    public static boolean compareBytes(char[] bytes1, char[] bytes2) {
+        if (bytes1.length != bytes2.length) {
+            System.out.println("compareBytes() : pas la meme longueur");
+            return false;
+        }
+
+        int i;
+        for (i = 0; i < bytes1.length; i++) {
+            if (bytes1[i] != bytes2[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        String fichier = args[0];
+        String filtre = null;
+
+        if (args.length == 2) {
+            filtre = args[1];
+        }
+
+        Analyseur a = new Analyseur();
+        a.visualize(fichier, filtre);
+
+    }
+
     /*
     Lit les trames écrites dans le fichier passé en argument
     Ecrit les trames de manière lisible, filtrées selon le filtre passé en ligne de commande (s'il y a un filtre)
@@ -78,24 +124,6 @@ public class Analyseur {
 
     }
 
-
-    //retourne un String représentant les octets passés en paramètre comme des caractères ASCII
-    public static String bytesToStringAscii(char[] bytes) {
-        if (bytes == null) {
-            System.out.println("bytesToStringAscii() : pas d'octets");
-            //lancer une exception ?
-            return null;
-        }
-
-        String res = "";
-        int i;
-        for (i = 0; i < bytes.length; i++) {
-            res += bytes[i];
-        }
-        return res;
-    }
-
-
     //renvoie true si ip est dans le filtre boolExp, false sinon
     //renvoie true s'il n'y a pas de filtre (sans filtre il faut garder toutes les trames)
     public boolean gardeIP(String boolExp, char[] ip) {
@@ -128,38 +156,6 @@ public class Analyseur {
             }
         }
         return false;
-    }
-
-
-    //vérifie l'égalité de deux tableaux d'octets
-    public static boolean compareBytes(char[] bytes1, char[] bytes2) {
-        if (bytes1.length != bytes2.length) {
-            System.out.println("compareBytes() : pas la meme longueur");
-            return false;
-        }
-
-        int i;
-        for (i = 0; i < bytes1.length; i++) {
-            if (bytes1[i] != bytes2[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    public static void main(String[] args) {
-
-        String fichier = args[0];
-        String filtre = null;
-
-        if (args.length == 2) {
-            filtre = args[1];
-        }
-
-        Analyseur a = new Analyseur();
-        a.visualize(fichier, filtre);
-
     }
 
 

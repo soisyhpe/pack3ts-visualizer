@@ -2,7 +2,7 @@ package fr.eroschn.cours.lu3in033.projetfx.application;
 
 public class CustomTime {
 
-    private long time;
+    private final long time;
 
     public CustomTime(long time) {
         this.time = time;
