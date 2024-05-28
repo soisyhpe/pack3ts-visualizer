@@ -1,26 +1,10 @@
-# Visualisateur de trafic réseau
+# Pack3ts Visualizer
 
----
+## Préambule
 
-## Structure du code
+Pack3ts Visualizer est un logiciel conçu dans le cadre du projet de fin de semestre de l'unité d'enseignement "Réseaux" (LU3IN033) de Sorbonne Université pour l'année universitaire 2022-2023. Ce logiciel permet d'analyser les trames des différentes couches du modèle TCP/IP à partir des octets échangés entre deux machines.
 
----
+## Auteurs
 
-### Analyseur de trame
-
-Afin de permettre à notre programme de visualiser correctement les octets qui lui sont transmis, il a fallut mettre en place de quoi analyser les trames. C'est dans cet optique que nous avons du implanter les classes suivantes :
-
-Pour la couche 2 (Ethernet) : `MacAddress`, `EthernetType`, `EthernetHeader`, `EthernetFrame` et `EthernetData`.
-L'ensemble de ces classes nous permettent d'obtenir différents objets.
-
-
-### Visualisateur de trafic réseau
-
-## Bugs connus
-
----
-
-Voici, ci-dessous, une liste des bugs / dysfonctionnements connus :
-
-- [[bug-1](https://github.com/)] l'affichage des trames dans le visualisateur graphique provoque des duplications de lignes
-- [[bug-2]()] 
+Mélissa LACOUR
+Eros CHAN
