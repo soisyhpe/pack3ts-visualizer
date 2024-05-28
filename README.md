@@ -6,5 +6,5 @@ Pack3ts Visualizer est un logiciel conçu dans le cadre du projet de fin de seme
 
 ## Auteurs
 
-Mélissa LACOUR
-Eros CHAN
+- Mélissa LACOUR
+- Eros CHAN
